@@ -1,0 +1,35 @@
+/* TOKENS */
+
+<id> ::= ([A-Z]) | ([a-z])+
+<num> ::= [0-9]+
+
+/* GRAMMAR */
+<linea> ::= <exp>
+		|	"var" <id> <var_def> 
+
+<var_def> ::= E
+		|	"=" <exp>
+
+<exp> ::= <aditiva>
+		|	<id> "=" <exp>
+
+<aditiva> ::= <term> <aditiva_>
+
+<aditiva_> ::= "+" <exp>
+		|	"-" <exp>
+		|   E
+
+<term> ::= <fact> <term_>
+
+<term_> ::= "*" <fact> <term_>
+		|	"/" <fact> <term_>
+		|	E
+
+<fact> ::= <prim> <pot>
+
+<pot> ::= "^" <fact>
+		|	E
+
+<prim> ::= <id>
+		|	<num>
+        |	"(" <exp> ")"
