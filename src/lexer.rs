@@ -30,6 +30,7 @@ enum State {
     Op,
     OpRec,
     Oth,
+    End,
     Error(LexErr),
 }
 
@@ -86,7 +87,6 @@ impl<'a> Scanner<'a> {
         let next_token = self.next_token()?;
 
         if token == next_token {
-            println!("True");
             self.matched.set(true);
             Ok(())
         } else {
@@ -103,7 +103,7 @@ impl<'a> Scanner<'a> {
             'a'..='z' | 'A'..='Z' => State::Ident,
             '(' => State::ParenL,
             ')' => State::ParenR,
-            '+' | '-' | '*' | '/' | '=' => State::Op,
+            '+' | '-' | '*' | '/' | '^' | '=' => State::Op,
             ' ' | '\n' => State::Blank,
             _ => State::Oth,
         }
@@ -117,10 +117,9 @@ impl<'a> Scanner<'a> {
 
             if let Some(state) = self.scan() {
                 return match state {
+                    State::Init => Ok(Token::EOF),
                     State::Ident => Ok(Token::TKId(self.lex_item.borrow().to_string())),
-                    State::Num => Ok(Token::TKNum(
-                        self.lex_item.borrow().parse::<i32>().unwrap(),
-                    )),
+                    State::Num => Ok(Token::TKNum(self.lex_item.borrow().parse::<i32>().unwrap())),
                     State::ParenL => Ok(Token::TKParenL),
                     State::ParenR => Ok(Token::TKParenR),
                     State::Op => Ok(Token::TKOprt(self.lex_item.borrow().to_string())),
@@ -196,28 +195,35 @@ impl<'a> Scanner<'a> {
         let mut iter = self.it.borrow_mut();
         let mut state_read: State;
 
-        while let Some(c) = iter.peek() {
-            state_read = Self::lex(&c);
-            next_state = self.next_state(state_read);
+        loop {
+            match iter.peek() {
+                Some(c) => {
+                    state_read = Self::lex(&c);
+                    next_state = self.next_state(state_read);
+                    if Self::accept_token(next_state) {
+                        let last_state = if let State::IdentRec | State::NumRec = next_state {
+                            self.check_errors(state_read)
+                        } else {
+                            self.state.get()
+                        };
+                        self.state.set(State::Init);
 
-            if Self::accept_token(next_state) {
-                let last_state = if let State::IdentRec | State::NumRec = next_state {
-                    self.check_errors(state_read)
-                } else {
-                    self.state.get()
-                };
-                self.state.set(State::Init);
+                        return Some(last_state);
+                    } else {
+                        self.state.set(next_state);
+                        if !c.is_ascii_whitespace() {
+                            self.lex_item.borrow_mut().push(*c)
+                        };
+                    }
+                    iter.next();
+                }
+                None => {
+                    let last_state = self.check_errors(State::End);
+                    self.state.set(State::Init);
 
-                return Some(last_state);
-            } else {
-                self.state.set(next_state);
-                if !c.is_ascii_whitespace() {
-                    self.lex_item.borrow_mut().push(*c)
-                };
+                    return Some(last_state);
+                }
             }
-            iter.next();
         }
-
-        None
     }
 }

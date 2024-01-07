@@ -3,43 +3,39 @@ use crate::parser::GramItem::{self, Id, Num, Op};
 use std::fmt::Debug;
 
 #[derive(Debug)]
-pub struct ParseTree {
-    pub root: GramItem,
-    pub left: SubTree,
-    pub right: SubTree,
+pub struct ParseNode {
+    root: GramItem,
+    children: Vec<Self>,
 }
 
-type SubTree = Option<Box<ParseTree>>;
-
-impl ParseTree {
-    pub fn new(root: GramItem) -> Self {
+impl ParseNode {
+    pub fn new(data: GramItem) -> Self {
         Self {
-            root,
-            left: None,
-            right: None,
+            root: data,
+            children: vec![],
         }
     }
 
-    pub fn trav_pre_order(&self) {
-        println!("{:?}", self.root);
+    // pub fn trav_pre_order(&self) {
+    //     println!("{:?}", self.root);
 
-        if let Some(ref sub) = self.left {
-            sub.trav_pre_order();
-        }
-        if let Some(ref sub) = self.right {
-            sub.trav_pre_order();
-        }
-    }
+    //     if let Some(ref sub) = self.left {
+    //         sub.trav_pre_order();
+    //     }
+    //     if let Some(ref sub) = self.right {
+    //         sub.trav_pre_order();
+    //     }
+    // }
 
-    pub fn trav_in_order(&self) {
-        if let Some(ref sub) = self.left {
-            sub.trav_in_order();
-        }
+    // pub fn trav_in_order(&self) {
+    //     if let Some(ref sub) = self.left {
+    //         sub.trav_in_order();
+    //     }
 
-        println!("{:?}", self.root);
+    //     println!("{:?}", self.root);
 
-        if let Some(ref sub) = self.right {
-            sub.trav_in_order();
-        }
-    }
+    //     if let Some(ref sub) = self.right {
+    //         sub.trav_in_order();
+    //     }
+    // }
 }
