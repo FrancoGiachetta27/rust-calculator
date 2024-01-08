@@ -15,8 +15,8 @@
 
 <aditiva> ::= <term> <aditiva_>
 
-<aditiva_> ::= "+" <exp>
-		|	"-" <exp>
+<aditiva_> ::= "+" <term> <aditiva_>
+		|	"-" <term> <aditiva_>
 		|   E
 
 <term> ::= <fact> <term_>

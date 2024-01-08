@@ -43,7 +43,16 @@ fn sum_multiple_numbers() {
 
 #[test]
 fn sub_multiple_numbers() {
-    let sum = Parser::parse("1-3-5").unwrap();
+    let sub = Parser::parse("1-3-5").unwrap();
 
-    assert_eq!(-7, sum);
+    assert_eq!(-7, sub);
+}
+
+#[test]
+fn sum_error() {
+    let sum = Parser::parse("1--1");
+    let sum2 = Parser::parse("-2-2");
+    
+    assert!(sum.is_err());
+    assert!(sum2.is_err());
 }

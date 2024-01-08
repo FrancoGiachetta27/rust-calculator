@@ -93,20 +93,22 @@ impl<'a> Parser<'a> {
 
     fn parse_sum_(&self) -> Result<i32, String> {
         let token = self.scanner.next_token()?;
-
+        let mut result = 0;
+        
         match token {
             TKOprt(ref op) if op == "+" => {
                 self.scanner.match_token(token)?;
-                Ok(self.parse_exp()?)
+
+                result = result + self.parse_term()? + self.parse_sum_()?;
             }
             TKOprt(ref op) if op == "-" => {
                 self.scanner.match_token(token)?;
-                let result = self.parse_exp()?;
-
-                Ok(-result)
+                result = result - self.parse_term()? + self.parse_sum_()?;
             }
-            _ => Ok(0 as i32),
+            _ => {},
         }
+
+        Ok(result)
     }
 
     fn parse_term(&self) -> Result<i32, String> {
@@ -169,7 +171,7 @@ impl<'a> Parser<'a> {
             //     self.parse_exp()?;
             //     self.scanner.match_token(TKParenR)?;
             // }
-            _ => Ok(0 as i32),
+            _ => return Err(format!("Syntax Error in parse_prim -> {token:?}")),
         }
     }
 }
