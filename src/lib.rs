@@ -7,7 +7,7 @@ use Token::{TKId, TKNum, TKOprt, TKParenL, TKParenR, TKVar, EOF};
 #[derive(Debug)]
 pub enum GramItem {
     Id(String),
-    Num(i32),
+    Num(f32),
     Op(GramOp),
 }
 
@@ -32,13 +32,14 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn parse(input: &'a str) -> Result<i32, String> {
+    pub fn parse(input: &'a str) -> Result<f32, String> {
         let parser = Self::new(input);
 
         Ok(parser.parse_line()?)
     }
+
     // parse line
-    fn parse_line(&self) -> Result<i32, String> {
+    fn parse_line(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
 
         match token {
@@ -67,7 +68,7 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
-    fn parse_exp(&self) -> Result<i32, String> {
+    fn parse_exp(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
 
         match token {
@@ -87,14 +88,14 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn parse_sum(&self) -> Result<i32, String> {
+    fn parse_sum(&self) -> Result<f32, String> {
         Ok(self.parse_term()? + self.parse_sum_()?)
     }
 
-    fn parse_sum_(&self) -> Result<i32, String> {
+    fn parse_sum_(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
-        let mut result = 0;
-        
+        let mut result = 0.0;
+
         match token {
             TKOprt(ref op) if op == "+" => {
                 self.scanner.match_token(token)?;
@@ -105,38 +106,38 @@ impl<'a> Parser<'a> {
                 self.scanner.match_token(token)?;
                 result = result - self.parse_term()? + self.parse_sum_()?;
             }
-            _ => {},
+            _ => {}
         }
 
         Ok(result)
     }
 
-    fn parse_term(&self) -> Result<i32, String> {
-        let lhs = self.parse_fact()?;
-        self.parse_term_()?;
-
-        Ok(lhs)
+    fn parse_term(&self) -> Result<f32, String> {
+        Ok(self.parse_fact()? * self.parse_term_()?)
     }
 
-    fn parse_term_(&self) -> Result<i32, String> {
+    fn parse_term_(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
+        let mut result = 1.0;
 
         match token {
-            // TKOprt(ref op) if op == "*" => {
-            //     self.scanner.match_token(token)?;
-            //     self.parse_fact()?;
-            //     self.parse_term_()?;
-            // }
-            // TKOprt(ref op) if op == "/" => {
-            //     self.scanner.match_token(token)?;
-            //     self.parse_fact()?;
-            //     self.parse_term_()?;
-            // }
-            _ => Ok(0 as i32),
+            TKOprt(ref op) if op == "*" => {
+                self.scanner.match_token(token)?;
+
+                result = result * self.parse_fact()? * self.parse_term_()?;
+            }
+            TKOprt(ref op) if op == "/" => {
+                self.scanner.match_token(token)?;
+
+                result = result * (1.0 / self.parse_fact()?) * self.parse_term_()?;
+            }
+            _ => {}
         }
+
+        Ok(result)
     }
 
-    fn parse_fact(&self) -> Result<i32, String> {
+    fn parse_fact(&self) -> Result<f32, String> {
         let lhs = self.parse_prim()?;
         // self.parse_pow()?;
 
@@ -157,13 +158,13 @@ impl<'a> Parser<'a> {
     //     Ok(())
     // }
 
-    fn parse_prim(&self) -> Result<i32, String> {
+    fn parse_prim(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
 
         match token {
             TKNum(num) => {
                 self.scanner.match_token(token)?;
-                println!("{num}");
+
                 Ok(num)
             }
             // TKParenL => {

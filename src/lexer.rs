@@ -4,9 +4,9 @@ use std::{
     str::Chars,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    TKNum(i32),
+    TKNum(f32),
     TKParenL,
     TKParenR,
     TKId(String),
@@ -119,7 +119,7 @@ impl<'a> Scanner<'a> {
                 return match state {
                     State::Init => Ok(Token::EOF),
                     State::Ident => Ok(Token::TKId(self.lex_item.borrow().to_string())),
-                    State::Num => Ok(Token::TKNum(self.lex_item.borrow().parse::<i32>().unwrap())),
+                    State::Num => Ok(Token::TKNum(self.lex_item.borrow().parse::<f32>().unwrap())),
                     State::ParenL => Ok(Token::TKParenL),
                     State::ParenR => Ok(Token::TKParenR),
                     State::Op => Ok(Token::TKOprt(self.lex_item.borrow().to_string())),
