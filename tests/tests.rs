@@ -31,21 +31,44 @@ use rust_calculator::Parser;
 
 #[test]
 fn one_number() {
-    assert_eq!(2, Parser::parse("2").unwrap())
+    assert_eq!(2.0, Parser::parse("2").unwrap())
 }
 
 #[test]
 fn sum_multiple_numbers() {
     let sum = Parser::parse("2+4+6+8+10").unwrap();
 
-    assert_eq!(30, sum);
+    assert_eq!(30.0, sum);
 }
 
 #[test]
 fn sub_multiple_numbers() {
     let sub = Parser::parse("1-3-5").unwrap();
 
-    assert_eq!(-7, sub);
+    assert_eq!(-7.0, sub);
+}
+
+#[test]
+fn div_multiple_numbers() {
+    let sub = Parser::parse("2/2/2/2").unwrap();
+
+    assert_eq!(1.0/4.0, sub);
+}
+
+#[test]
+fn mul_multiple_numbers() {
+    let sub = Parser::parse("2*2*2*2").unwrap();
+
+    assert_eq!(16.0, sub);
+}
+
+#[test]
+fn combine_sum_div_mul() {
+    let sum = Parser::parse("2 + 6*3/2 + 5*4 + 1").unwrap();
+    let sum2 = Parser::parse("1 - 2*3*5/2 - 4/2*2 + 5*3*2").unwrap();
+    
+    assert_eq!(32.0, sum);
+    assert_eq!(12.0, sum2);
 }
 
 #[test]
