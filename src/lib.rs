@@ -163,11 +163,13 @@ impl<'a> Parser<'a> {
 
                 Ok(num)
             }
-            // TKParenL => {
-            //     self.scanner.match_token(token)?;
-            //     self.parse_exp()?;
-            //     self.scanner.match_token(TKParenR)?;
-            // }
+            TKParenL => {
+                self.scanner.match_token(token)?;
+                let result = self.parse_exp()?;
+                self.scanner.match_token(TKParenR)?;
+
+                Ok(result)
+            }
             _ => return Err(format!("Syntax Error in parse_prim -> {token:?}")),
         }
     }

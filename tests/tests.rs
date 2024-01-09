@@ -70,11 +70,18 @@ fn pow_multiple_numbers() {
 }
 
 #[test]
+fn with_parenthesis() {
+    let sum_with_paren = Parser::parse("(2*(4+3*4)*6)/(2^((2*3)+3))").unwrap();
+
+    assert_eq!(0.375, sum_with_paren);
+}
+
+#[test]
 fn combined_op() {
     let sum = Parser::parse("2 + 6*3/2 + 5*4 + 1").unwrap();
     let sum2 = Parser::parse("1 - 2*3*5/2 - 4/2*2 + 5*3*2").unwrap();
     let sum3 = Parser::parse("1^2+7*3^5-120^2").unwrap();
-    
+
     assert_eq!(32.0, sum);
     assert_eq!(12.0, sum2);
     assert_eq!(-12698.0, sum3);
