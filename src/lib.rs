@@ -138,25 +138,21 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_fact(&self) -> Result<f32, String> {
-        let lhs = self.parse_prim()?;
-        // self.parse_pow()?;
-
-        Ok(lhs)
+        Ok(self.parse_prim()?.powf(self.parse_pow()?))
     }
 
-    // fn parse_pow(&self) -> Result<(), String> {
-    //     let token = self.scanner.next_token()?;
+    fn parse_pow(&self) -> Result<f32, String> {
+        let token = self.scanner.next_token()?;
 
-    //     match token {
-    //         TKOprt(ref op) if op == "^" => {
-    //             self.scanner.match_token(token)?;
-    //             self.parse_fact()?;
-    //         }
-    //         _ => {}
-    //     }
+        match token {
+            TKOprt(ref op) if op == "^" => {
+                self.scanner.match_token(token)?;
 
-    //     Ok(())
-    // }
+                Ok(self.parse_fact()?)
+            }
+            _ => {Ok(1 as f32)}
+        }
+    }
 
     fn parse_prim(&self) -> Result<f32, String> {
         let token = self.scanner.next_token()?;
