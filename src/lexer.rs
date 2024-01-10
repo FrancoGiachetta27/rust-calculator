@@ -11,7 +11,6 @@ pub enum Token {
     TKParenR,
     TKId(String),
     TKOprt(String),
-    TKVar,
     EOF,
 }
 

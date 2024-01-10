@@ -1,25 +1,7 @@
 pub mod lexer;
 
 use crate::lexer::*;
-use std::fmt::Debug;
-use Token::{TKId, TKNum, TKOprt, TKParenL, TKParenR, TKVar, EOF};
-
-#[derive(Debug)]
-pub enum GramItem {
-    Id(String),
-    Num(f32),
-    Op(GramOp),
-}
-
-#[derive(Debug)]
-pub enum GramOp {
-    Eql,
-    Sum,
-    Sub,
-    Mul,
-    Div,
-    Pow,
-}
+use Token::{TKId, TKNum, TKOprt, TKParenL, TKParenR, EOF};
 
 pub struct Parser<'a> {
     scanner: Scanner<'a>,
@@ -150,7 +132,7 @@ impl<'a> Parser<'a> {
 
                 Ok(self.parse_fact()?)
             }
-            _ => {Ok(1 as f32)}
+            _ => Ok(1 as f32),
         }
     }
 
